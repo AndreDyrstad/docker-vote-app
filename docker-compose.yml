@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+    vote:
+        build:
+            context: ./app
+        image: tjommi/vote-app
+        ports: 
+            - "3000:80"
+        links:
+            - api
+
+    api:
+        build: ./api
+        image: tjommi/vote-api
+        depends_on: 
+            - db
+        links:
+            - db
+        restart: on-failure
+
+    db:
+        build: ./sql
+        image: tjommi/vote-sql
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3306"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
